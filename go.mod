@@ -1,6 +1,8 @@
 module github.com/cometbft/cometbft
 
-go 1.21
+go 1.21.1
+
+toolchain go1.21.5
 
 require (
 	github.com/BurntSushi/toml v1.3.2
@@ -274,7 +276,9 @@ require (
 	github.com/stbenjam/no-sprintf-host-port v0.1.1 // indirect
 	github.com/stoewer/go-strcase v1.3.0 // indirect
 	github.com/stretchr/objx v0.5.0 // indirect
-	github.com/subosito/gotenv v1.6.0 // indirect
+    github.com/subosito/gotenv v1.6.0 // indirect
+	github.com/sunrise-zone/sunrise-app/pkg/blob v0.0.0-20240106110541-17a39acb5414 // indirect
+	github.com/sunrise-zone/sunrise-app/pkg/namespace v0.0.0-20240106114425-fcbe9cdfd972 // indirect
 	github.com/t-yuki/gocover-cobertura v0.0.0-20180217150009-aaee18c8195c // indirect
 	github.com/tdakkota/asciicheck v0.2.0 // indirect
 	github.com/tetafro/godot v1.4.15 // indirect
