@@ -310,7 +310,7 @@ func (blockExec *BlockExecutor) ApplyBlock(
 
 	// Events are fired after everything else.
 	// NOTE: if we crash between Commit and Save, events wont be fired during replay
-	fireEvents(blockExec.logger, blockExec.eventBus, block, blockID, abciResponse, validatorUpdates)
+	fireEvents(blockExec.logger, blockExec.eventBus, block, blockID, abciResponse, validatorUpdates, state.LastValidators)
 
 	return state, nil
 }
@@ -662,6 +662,9 @@ func fireEvents(
 	blockID types.BlockID,
 	abciResponse *abci.FinalizeBlockResponse,
 	validatorUpdates []*types.Validator,
+	// <celestia-core>
+	currentValidatorSet *types.ValidatorSet,
+	// </celestia-core>
 ) {
 	if err := eventBus.PublishEventNewBlock(types.EventDataNewBlock{
 		Block:               block,
@@ -670,6 +673,20 @@ func fireEvents(
 	}); err != nil {
 		logger.Error("failed publishing new block", "err", err)
 	}
+
+	// <celestia-core>
+	if block.LastCommit != nil {
+		err := eventBus.PublishEventNewSignedBlock(types.EventDataSignedBlock{
+			Header:       block.Header,
+			Commit:       *block.LastCommit,
+			ValidatorSet: *currentValidatorSet,
+			Data:         block.Data,
+		})
+		if err != nil {
+			logger.Error("failed publishing new signed block", "err", err)
+		}
+	}
+	// </celestia-core>
 
 	if err := eventBus.PublishEventNewBlockHeader(types.EventDataNewBlockHeader{
 		Header: block.Header,
