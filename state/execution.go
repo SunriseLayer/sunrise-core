@@ -16,6 +16,7 @@ import (
 	"github.com/cometbft/cometbft/types"
 
 	// <celestia-core>
+	"github.com/cometbft/cometbft/crypto/tmhash"
 	"github.com/sunrise-zone/sunrise-app/pkg/blob"
 	// </celestia-core>
 )
@@ -155,12 +156,30 @@ func (blockExec *BlockExecutor) CreateProposalBlock(
 		return nil, err
 	}
 
-	txl := types.ToTxs(rpp.Txs)
-	if err := txl.Validate(maxDataBytes); err != nil {
-		return nil, err
+	// Celestia passes the data root back as the last transaction
+	if len(rpp.Txs) < 1 {
+		panic("state machine returned an invalid prepare proposal response: expected at least 1 transaction")
 	}
 
-	return state.MakeBlock(height, txl, commit, evidence, proposerAddr), nil
+	if len(rpp.Txs[len(rpp.Txs)-1]) != tmhash.Size {
+		panic(fmt.Sprintf("state machine returned an invalid prepare proposal response: expected last transaction to be a hash, got %d bytes", len(rpp.Txs[len(rpp.Txs)-2])))
+	}
+
+	// update the block with the response from PrepareProposal
+	block.Data, _ = types.DataFromProto(&cmtproto.Data{
+		Txs:  rpp.Txs[:len(rpp.Txs)-1],
+		Hash: rpp.Txs[len(rpp.Txs)-1],
+	})
+
+	var blockDataSize int
+	for _, tx := range block.Txs {
+		blockDataSize += len(tx)
+		if maxDataBytes < int64(blockDataSize) {
+			panic("block data exceeds max amount of allowed bytes")
+		}
+	}
+
+	return block, nil
 }
 
 func (blockExec *BlockExecutor) ProcessProposal(
