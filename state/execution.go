@@ -157,6 +157,7 @@ func (blockExec *BlockExecutor) CreateProposalBlock(
 		return nil, err
 	}
 
+	// <celestia-core>
 	// Celestia passes the data root back as the last transaction
 	if len(rpp.Txs) < 2 {
 		panic("state machine returned an invalid prepare proposal response: expected at least 2 transaction")
@@ -180,6 +181,7 @@ func (blockExec *BlockExecutor) CreateProposalBlock(
 			panic("block data exceeds max amount of allowed bytes")
 		}
 	}
+	// </celestia-core>
 
 	return block, nil
 }
