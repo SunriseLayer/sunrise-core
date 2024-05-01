@@ -5,7 +5,6 @@ import (
 	"context"
 	"encoding/binary"
 	"fmt"
-	"reflect"
 	"time"
 
 	abci "github.com/cometbft/cometbft/abci/types"
@@ -164,7 +163,7 @@ func (blockExec *BlockExecutor) CreateProposalBlock(
 
 	// <sunrise-core>
 	if len(rpp.Txs) >= 3 {
-		if reflect.DeepEqual(rpp.Txs[len(rpp.Txs)-3], []byte{}) {
+		if len(rpp.Txs[len(rpp.Txs)-3]) == 0 {
 			// update the block with the response from PrepareProposal
 			block.Data, _ = types.DataFromProto(&cmtproto.Data{
 				Txs:        rpp.Txs[:len(rpp.Txs)-2],
