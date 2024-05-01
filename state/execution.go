@@ -163,7 +163,7 @@ func (blockExec *BlockExecutor) CreateProposalBlock(
 	}
 
 	// <sunrise-core>
-	if len(rpp.Txs) > 2 && len(rpp.Txs)-2 == tmhash.Size {
+	if len(rpp.Txs) >= 2 && len(rpp.Txs)-2 == tmhash.Size {
 		// update the block with the response from PrepareProposal
 		block.Data, _ = types.DataFromProto(&cmtproto.Data{
 			Txs:        rpp.Txs[:len(rpp.Txs)-2],
