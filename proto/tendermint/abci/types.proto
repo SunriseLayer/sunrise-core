@@ -6,6 +6,9 @@ option go_package = "github.com/cometbft/cometbft/abci/types";
 // For more information on gogo.proto, see:
 // https://github.com/cosmos/gogoproto/blob/master/extensions.md
 import "tendermint/crypto/proof.proto";
+// <celestia-core>
+import "tendermint/types/types.proto";
+// </celestia-core>
 import "tendermint/crypto/keys.proto";
 import "tendermint/types/params.proto";
 import "tendermint/types/validator.proto";
@@ -131,7 +134,13 @@ message RequestPrepareProposal {
   int64 max_tx_bytes = 1;
   // txs is an array of transactions that will be included in a block,
   // sent to the app for possible modifications.
-  repeated bytes            txs                  = 2;
+  // repeated bytes            txs                  = 2;
+  // <celestia-core>
+  // block_data is an array of transactions that will be included in a block,
+  // sent to the app for possible modifications.
+  // applications can not exceed the size of the data passed to it.
+  tendermint.types.Data block_data = 2;
+  // </celestia-core>
   ExtendedCommitInfo        local_last_commit    = 3 [(gogoproto.nullable) = false];
   repeated Misbehavior      misbehavior          = 4 [(gogoproto.nullable) = false];
   int64                     height               = 5;
@@ -142,7 +151,13 @@ message RequestPrepareProposal {
 }
 
 message RequestProcessProposal {
-  repeated bytes       txs                  = 1;
+  // repeated bytes       txs                  = 1;
+  // <celestia-core>
+  // block_data is an array of transactions that will be included in a block,
+  // sent to the app for possible modifications.
+  // applications can not exceed the size of the data passed to it.
+  tendermint.types.Data block_data = 1;
+  // </celestia-core>
   CommitInfo           proposed_last_commit = 2 [(gogoproto.nullable) = false];
   repeated Misbehavior misbehavior          = 3 [(gogoproto.nullable) = false];
   // hash is the merkle root hash of the fields of the proposed block.
@@ -318,7 +333,10 @@ message ResponseApplySnapshotChunk {
 }
 
 message ResponsePrepareProposal {
-  repeated bytes txs = 1;
+  // repeated bytes txs = 1;
+  // <celestia-core>
+  tendermint.types.Data block_data = 1;
+  // </celestia-core>
 }
 
 message ResponseProcessProposal {
