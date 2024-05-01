@@ -5,6 +5,7 @@ import (
 	"context"
 	"encoding/binary"
 	"fmt"
+	"reflect"
 	"time"
 
 	abci "github.com/cometbft/cometbft/abci/types"
@@ -17,7 +18,6 @@ import (
 	"github.com/cometbft/cometbft/types"
 
 	// <celestia-core>
-	"github.com/cometbft/cometbft/crypto/tmhash"
 	"github.com/sunrise-zone/sunrise-app/pkg/blob"
 	// </celestia-core>
 )
@@ -163,7 +163,7 @@ func (blockExec *BlockExecutor) CreateProposalBlock(
 	}
 
 	// <sunrise-core>
-	if len(rpp.Txs) >= 2 && len(rpp.Txs)-2 == tmhash.Size {
+	if reflect.DeepEqual(rpp.Txs[len(rpp.Txs)-3], []byte{}) {
 		// update the block with the response from PrepareProposal
 		block.Data, _ = types.DataFromProto(&cmtproto.Data{
 			Txs:        rpp.Txs[:len(rpp.Txs)-2],
