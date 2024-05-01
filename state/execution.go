@@ -163,22 +163,24 @@ func (blockExec *BlockExecutor) CreateProposalBlock(
 	}
 
 	// <sunrise-core>
-	if reflect.DeepEqual(rpp.Txs[len(rpp.Txs)-3], []byte{}) {
-		// update the block with the response from PrepareProposal
-		block.Data, _ = types.DataFromProto(&cmtproto.Data{
-			Txs:        rpp.Txs[:len(rpp.Txs)-2],
-			Hash:       rpp.Txs[len(rpp.Txs)-2],
-			SquareSize: binary.BigEndian.Uint64(rpp.Txs[len(rpp.Txs)-1]),
-		})
+	if len(rpp.Txs) >= 3 {
+		if reflect.DeepEqual(rpp.Txs[len(rpp.Txs)-3], []byte{}) {
+			// update the block with the response from PrepareProposal
+			block.Data, _ = types.DataFromProto(&cmtproto.Data{
+				Txs:        rpp.Txs[:len(rpp.Txs)-2],
+				Hash:       rpp.Txs[len(rpp.Txs)-2],
+				SquareSize: binary.BigEndian.Uint64(rpp.Txs[len(rpp.Txs)-1]),
+			})
 
-		block.DataHash = rpp.Txs[len(rpp.Txs)-2]
+			block.DataHash = rpp.Txs[len(rpp.Txs)-2]
 
-		var blockDataSize int
-		for _, tx := range block.Txs {
-			blockDataSize += len(tx)
-			if maxDataBytes < int64(blockDataSize) {
-				err = fmt.Errorf("block data exceeds max amount of allowed bytes")
-				return nil, err
+			var blockDataSize int
+			for _, tx := range block.Txs {
+				blockDataSize += len(tx)
+				if maxDataBytes < int64(blockDataSize) {
+					err = fmt.Errorf("block data exceeds max amount of allowed bytes")
+					return nil, err
+				}
 			}
 		}
 	}
