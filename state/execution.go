@@ -3,7 +3,6 @@ package state
 import (
 	"bytes"
 	"context"
-	"encoding/binary"
 	"fmt"
 	"time"
 
@@ -17,7 +16,6 @@ import (
 	"github.com/cometbft/cometbft/types"
 
 	// <celestia-core>
-	"github.com/cometbft/cometbft/crypto/tmhash"
 	"github.com/sunrise-zone/sunrise-app/pkg/blob"
 	// </celestia-core>
 )
@@ -131,12 +129,15 @@ func (blockExec *BlockExecutor) CreateProposalBlock(
 
 	txs := blockExec.mempool.ReapMaxBytesMaxGas(maxReapBytes, maxGas)
 	commit := lastExtCommit.ToCommit()
-	block := state.MakeBlock(height, txs, commit, evidence, proposerAddr)
+	block := state.MakeBlock(height, types.Data{Txs: txs}, commit, evidence, proposerAddr)
 	rpp, err := blockExec.proxyApp.PrepareProposal(
 		ctx,
 		&abci.RequestPrepareProposal{
-			MaxTxBytes:         maxDataBytes,
-			Txs:                block.Txs.ToSliceOfBytes(),
+			MaxTxBytes: maxDataBytes,
+			// <celestia-core>
+			// Txs:                block.Txs.ToSliceOfBytes(),
+			BlockData: &cmtproto.Data{Txs: txs.ToSliceOfBytes()},
+			// </celestia-core>
 			LocalLastCommit:    buildExtendedCommitInfoFromStore(lastExtCommit, blockExec.store, state.InitialHeight, state.ConsensusParams.ABCI),
 			Misbehavior:        block.Evidence.Evidence.ToABCI(),
 			Height:             block.Height,
@@ -157,58 +158,54 @@ func (blockExec *BlockExecutor) CreateProposalBlock(
 		return nil, err
 	}
 
-	txl := types.ToTxs(rpp.Txs)
-	if err := txl.Validate(maxDataBytes); err != nil {
-		return nil, err
-	}
+	// txl := types.ToTxs(rpp.Txs)
+	// if err := txl.Validate(maxDataBytes); err != nil {
+	// 	return nil, err
+	// }
 
-	// <sunrise-core>
-	if len(rpp.Txs) == 0 {
-		return block, nil
-	}
-
-	// Sunrise passes the data root & square size back as the last 2 transaction
-	if len(rpp.Txs) < 2 {
-		err = fmt.Errorf("state machine returned an invalid prepare proposal response: expected at least 2 transaction")
-		return nil, err
-	}
-
-	if len(rpp.Txs[len(rpp.Txs)-2]) != tmhash.Size {
-		err = fmt.Errorf("state machine returned an invalid prepare proposal response: expected last transaction to be a hash, got %d bytes", len(rpp.Txs[len(rpp.Txs)-2]))
-		return nil, err
-	}
-
-	// update the block with the response from PrepareProposal
-	block.Data, _ = types.DataFromProto(&cmtproto.Data{
-		Txs:        rpp.Txs[:len(rpp.Txs)-2],
-		Hash:       rpp.Txs[len(rpp.Txs)-2],
-		SquareSize: binary.BigEndian.Uint64(rpp.Txs[len(rpp.Txs)-1]),
-	})
-
-	block.DataHash = rpp.Txs[len(rpp.Txs)-2]
-
+	rawNewData := rpp.GetBlockData()
 	var blockDataSize int
-	for _, tx := range block.Txs {
+	for _, tx := range rawNewData.GetTxs() {
 		blockDataSize += len(tx)
+
 		if maxDataBytes < int64(blockDataSize) {
-			err = fmt.Errorf("block data exceeds max amount of allowed bytes")
+			err := fmt.Errorf("block data exceeds max amount of allowed bytes")
 			return nil, err
 		}
 	}
 
-	return block, nil
-	//</sunrise-core>
+	newData, err := types.DataFromProto(rawNewData)
+	if err != nil {
+		return nil, err
+	}
+
+	return state.MakeBlock(
+			height,
+			// txl,
+			// <celestia-core>
+			newData,
+			// </celestia-core>
+			commit,
+			evidence,
+			proposerAddr),
+		nil
 }
 
 func (blockExec *BlockExecutor) ProcessProposal(
 	block *types.Block,
 	state State,
 ) (bool, error) {
+	// <celestia-core>
+	pData := block.Data.ToProto()
+	// </celestia-core>
 	resp, err := blockExec.proxyApp.ProcessProposal(context.TODO(), &abci.RequestProcessProposal{
-		Hash:               block.Header.Hash(),
-		Height:             block.Header.Height,
-		Time:               block.Header.Time,
-		Txs:                block.Data.Txs.ToSliceOfBytes(),
+		Hash:   block.Header.Hash(),
+		Height: block.Header.Height,
+		Time:   block.Header.Time,
+		// <celestia-core>
+		// Txs:                block.Data.Txs.ToSliceOfBytes(),
+		BlockData: &pData,
+		// </celestia-core>
 		ProposedLastCommit: buildLastCommitInfoFromStore(block, blockExec.store, state.InitialHeight),
 		Misbehavior:        block.Evidence.Evidence.ToABCI(),
 		ProposerAddress:    block.ProposerAddress,

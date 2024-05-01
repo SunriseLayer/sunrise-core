@@ -106,7 +106,14 @@ func MakeVoteNoError(
 // MakeBlock returns a new block with an empty header, except what can be
 // computed from itself.
 // It populates the same set of fields validated by ValidateBasic.
-func MakeBlock(height int64, txs []Tx, lastCommit *Commit, evidence []Evidence) *Block {
+func MakeBlock(
+	height int64,
+	// txs []Tx,
+	// <celestia-core>
+	data Data,
+	// </celestia-core>
+	lastCommit *Commit,
+	evidence []Evidence) *Block {
 	block := &Block{
 		Header: Header{
 			// <sunrise-core>
@@ -114,9 +121,10 @@ func MakeBlock(height int64, txs []Tx, lastCommit *Commit, evidence []Evidence) 
 			// </sunrise-core>
 			Height: height,
 		},
-		Data: Data{
-			Txs: txs,
-		},
+		// Data: Data{
+		// 	Txs: txs,
+		// },
+		Data:       data,
 		Evidence:   EvidenceData{Evidence: evidence},
 		LastCommit: lastCommit,
 	}
