@@ -17,7 +17,7 @@ import (
 	"github.com/cometbft/cometbft/types"
 
 	// <celestia-core>
-	"github.com/sunrise-zone/sunrise-app/pkg/blob"
+	"github.com/sunriselayer/sunrise/pkg/blob"
 	// </celestia-core>
 )
 
@@ -166,7 +166,7 @@ func (blockExec *BlockExecutor) CreateProposalBlock(
 		if len(rpp.Txs[len(rpp.Txs)-3]) == 0 {
 			// update the block with the response from PrepareProposal
 			block.Data, _ = types.DataFromProto(&cmtproto.Data{
-				Txs:        rpp.Txs[:len(rpp.Txs)-2],
+				Txs:        rpp.Txs[:len(rpp.Txs)-3],
 				Hash:       rpp.Txs[len(rpp.Txs)-2],
 				SquareSize: binary.BigEndian.Uint64(rpp.Txs[len(rpp.Txs)-1]),
 			})

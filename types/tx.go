@@ -14,7 +14,7 @@ import (
 	// <celestia-core>
 	"github.com/cometbft/cometbft/pkg/consts"
 	proto "github.com/cosmos/gogoproto/proto"
-	"github.com/sunrise-zone/sunrise-app/pkg/blob"
+	"github.com/sunriselayer/sunrise/pkg/blob"
 	// </celestia-core>
 )
 
