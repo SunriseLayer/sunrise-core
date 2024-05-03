@@ -17,7 +17,7 @@ import (
 	"github.com/cometbft/cometbft/types"
 
 	// <celestia-core>
-	"github.com/sunrise-zone/sunrise-app/pkg/blob"
+	"github.com/sunriselayer/sunrise/pkg/blob"
 	// </celestia-core>
 )
 
