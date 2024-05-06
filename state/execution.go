@@ -162,12 +162,15 @@ func (blockExec *BlockExecutor) CreateProposalBlock(
 
 	// <sunrise-core>
 	// update the block with the response from PrepareProposal
-	block.Data, _ = types.DataFromProto(&cmtproto.Data{
-		Txs:        rpp.Txs,
-		Hash:       rpp.DataHash,
-		SquareSize: rpp.SquareSize,
-	})
-	block.DataHash = rpp.DataHash
+	if len(rpp.DataHash) > 0 {
+		block.Data, _ = types.DataFromProto(&cmtproto.Data{
+			Txs:        rpp.Txs,
+			Hash:       rpp.DataHash,
+			SquareSize: rpp.SquareSize,
+		})
+
+		block.DataHash = rpp.DataHash
+	}
 
 	var blockDataSize int
 	for _, tx := range block.Txs {
