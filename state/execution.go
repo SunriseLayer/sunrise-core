@@ -3,7 +3,6 @@ package state
 import (
 	"bytes"
 	"context"
-	"encoding/binary"
 	"fmt"
 	"time"
 
@@ -162,25 +161,21 @@ func (blockExec *BlockExecutor) CreateProposalBlock(
 	}
 
 	// <sunrise-core>
-	if len(rpp.Txs) >= 3 {
-		if len(rpp.Txs[len(rpp.Txs)-3]) == 0 {
-			// update the block with the response from PrepareProposal
-			block.Data, _ = types.DataFromProto(&cmtproto.Data{
-				Txs:        rpp.Txs[:len(rpp.Txs)-3],
-				Hash:       rpp.Txs[len(rpp.Txs)-2],
-				SquareSize: binary.BigEndian.Uint64(rpp.Txs[len(rpp.Txs)-1]),
-			})
+	// update the block with the response from PrepareProposal
+	block.Data, _ = types.DataFromProto(&cmtproto.Data{
+		Txs:        rpp.Txs,
+		Hash:       rpp.DataHash,
+		SquareSize: rpp.SquareSize,
+	})
 
-			block.DataHash = rpp.Txs[len(rpp.Txs)-2]
+	block.Header.DataHash = rpp.DataHash
 
-			var blockDataSize int
-			for _, tx := range block.Txs {
-				blockDataSize += len(tx)
-				if maxDataBytes < int64(blockDataSize) {
-					err = fmt.Errorf("block data exceeds max amount of allowed bytes")
-					return nil, err
-				}
-			}
+	var blockDataSize int
+	for _, tx := range block.Txs {
+		blockDataSize += len(tx)
+		if maxDataBytes < int64(blockDataSize) {
+			err = fmt.Errorf("block data exceeds max amount of allowed bytes")
+			return nil, err
 		}
 	}
 
@@ -201,6 +196,8 @@ func (blockExec *BlockExecutor) ProcessProposal(
 		Misbehavior:        block.Evidence.Evidence.ToABCI(),
 		ProposerAddress:    block.ProposerAddress,
 		NextValidatorsHash: block.NextValidatorsHash,
+		SquareSize:         block.SquareSize,
+		DataHash:           block.DataHash,
 	})
 	if err != nil {
 		return false, err

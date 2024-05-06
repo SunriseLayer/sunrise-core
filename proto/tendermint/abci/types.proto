@@ -152,6 +152,15 @@ message RequestProcessProposal {
   bytes                     next_validators_hash = 7;
   // address of the public key of the original proposer of the block.
   bytes proposer_address = 8;
+  // <sunrise-core>
+  // SquareSize is the number of rows or columns in the original data square.
+  uint64 square_size = 9;
+
+  // Hash is the root of a binary Merkle tree where the leaves of the tree are
+  // the row and column roots of an extended data square. Hash is often referred
+  // to as the "data root".
+  bytes data_hash = 10;
+  // <sunrise-core>
 }
 
 // Extends a vote with application-injected data
@@ -319,6 +328,15 @@ message ResponseApplySnapshotChunk {
 
 message ResponsePrepareProposal {
   repeated bytes txs = 1;
+  // <sunrise-core>
+  // SquareSize is the number of rows or columns in the original data square.
+  uint64 square_size = 2;
+
+  // Hash is the root of a binary Merkle tree where the leaves of the tree are
+  // the row and column roots of an extended data square. Hash is often referred
+  // to as the "data root".
+  bytes data_hash = 3;
+  // <sunrise-core>
 }
 
 message ResponseProcessProposal {
