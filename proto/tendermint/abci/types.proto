@@ -160,7 +160,7 @@ message RequestProcessProposal {
   // the row and column roots of an extended data square. Hash is often referred
   // to as the "data root".
   bytes data_hash = 10;
-  // <sunrise-core>
+  // </sunrise-core>
 }
 
 // Extends a vote with application-injected data
@@ -336,7 +336,7 @@ message ResponsePrepareProposal {
   // the row and column roots of an extended data square. Hash is often referred
   // to as the "data root".
   bytes data_hash = 3;
-  // <sunrise-core>
+  // </sunrise-core>
 }
 
 message ResponseProcessProposal {
