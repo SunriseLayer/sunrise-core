@@ -167,6 +167,7 @@ func (blockExec *BlockExecutor) CreateProposalBlock(
 		Hash:       rpp.DataHash,
 		SquareSize: rpp.SquareSize,
 	})
+	block.DataHash = rpp.DataHash
 
 	var blockDataSize int
 	for _, tx := range block.Txs {
