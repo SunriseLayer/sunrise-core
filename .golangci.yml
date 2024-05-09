@@ -76,8 +76,10 @@ linters-settings:
           - github.com/spf13
           - github.com/stretchr/testify/require
           - github.com/syndtr/goleveldb
+          # <sunrise-core>
           - github.com/sunriselayer/sunrise/pkg/blob
           - github.com/celestiaorg/nmt
+          # </sunrise-core>
       test:
         files:
           - "$test"
