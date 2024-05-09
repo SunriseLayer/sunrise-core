@@ -97,8 +97,10 @@ func TestBlocksyncMessageVectors(t *testing.T) {
 		{"BlockRequestMessage", &bcproto.Message{Sum: &bcproto.Message_BlockRequest{
 			BlockRequest: &bcproto.BlockRequest{Height: math.MaxInt64}}},
 			"0a0a08ffffffffffffffff7f"},
+		// <sunrise-core>
 		{"BlockResponseMessage", &bcproto.Message{Sum: &bcproto.Message_BlockResponse{
 			BlockResponse: &bcproto.BlockResponse{Block: bpb}}}, "1a95010a92010a5d0a04080b10021803220b088092b8c398feffffff012a0212003a20c4da88e876062aa1543400d50d0eaa0dac88096057949cfb7bca7f3a48c04bf96a20e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855122f0a0b48656c6c6f20576f726c643220c4da88e876062aa1543400d50d0eaa0dac88096057949cfb7bca7f3a48c04bf91a00"},
+		// </sunrise-core>
 		{"NoBlockResponseMessage", &bcproto.Message{Sum: &bcproto.Message_NoBlockResponse{
 			NoBlockResponse: &bcproto.NoBlockResponse{Height: 1}}}, "12020801"},
 		{"NoBlockResponseMessage", &bcproto.Message{Sum: &bcproto.Message_NoBlockResponse{
