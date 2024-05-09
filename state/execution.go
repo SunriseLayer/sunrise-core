@@ -162,15 +162,17 @@ func (blockExec *BlockExecutor) CreateProposalBlock(
 
 	// <sunrise-core>
 	// update the block with the response from PrepareProposal
-	if len(rpp.DataHash) > 0 {
-		block.Data, _ = types.DataFromProto(&cmtproto.Data{
-			Txs:        rpp.Txs,
-			Hash:       rpp.DataHash,
-			SquareSize: rpp.SquareSize,
-		})
-
-		block.DataHash = rpp.DataHash
+	if len(rpp.DataHash) == 0 {
+		return state.MakeBlock(height, txl, commit, evidence, proposerAddr), nil
 	}
+
+	block.Data, _ = types.DataFromProto(&cmtproto.Data{
+		Txs:        rpp.Txs,
+		Hash:       rpp.DataHash,
+		SquareSize: rpp.SquareSize,
+	})
+
+	block.DataHash = rpp.DataHash
 
 	var blockDataSize int
 	for _, tx := range block.Txs {
@@ -705,6 +707,12 @@ func fireEvents(
 
 	// <celestia-core>
 	if block.LastCommit != nil {
+		if seenCommit == nil {
+			seenCommit = &types.Commit{}
+		}
+		if currentValidatorSet == nil {
+			currentValidatorSet = &types.ValidatorSet{}
+		}
 		err := eventBus.PublishEventNewSignedBlock(types.EventDataSignedBlock{
 			Header:       block.Header,
 			Commit:       *seenCommit,
