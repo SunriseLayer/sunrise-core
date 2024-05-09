@@ -10,6 +10,7 @@ import (
 	"github.com/cometbft/cometbft/pkg/consts"
 	cmtproto "github.com/cometbft/cometbft/proto/tendermint/types"
 	"github.com/cometbft/cometbft/state"
+
 	// </celestia-core>
 
 	cmtmath "github.com/cometbft/cometbft/libs/math"

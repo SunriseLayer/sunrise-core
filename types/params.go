@@ -9,6 +9,7 @@ import (
 	"github.com/cometbft/cometbft/crypto/secp256k1"
 	"github.com/cometbft/cometbft/crypto/tmhash"
 	cmtproto "github.com/cometbft/cometbft/proto/tendermint/types"
+
 	// <sunrise-core>
 	"github.com/cometbft/cometbft/version"
 	// </sunrise-core>
