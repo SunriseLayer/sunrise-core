@@ -7,9 +7,11 @@ import (
 
 	// <celestia-core>
 	"encoding/hex"
+	"strconv"
+
 	"github.com/cometbft/cometbft/crypto/merkle"
 	"github.com/cometbft/cometbft/pkg/consts"
-	"strconv"
+
 	// </celestia-core>
 
 	"github.com/cometbft/cometbft/libs/bytes"
