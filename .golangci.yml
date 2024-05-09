@@ -10,7 +10,9 @@ linters:
     - goconst
     - gofmt
     - goimports
-    - revive
+    # <sunrise-core>
+    # - revive
+    # </sunrise-core>
     - gosec
     - gosimple
     - govet
