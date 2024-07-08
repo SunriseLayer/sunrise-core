@@ -5,8 +5,7 @@
 
 name: e2e-nightly-34x
 on:
-  schedule:
-    - cron: '0 2 * * *'
+  workflow_dispatch:
 
 jobs:
   e2e-nightly-test:
@@ -15,17 +14,17 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        group: ['00', '01']
+        group: ["00", "01"]
     runs-on: ubuntu-latest
     timeout-minutes: 60
     steps:
       - uses: actions/setup-go@v5
         with:
-          go-version: '1.20'
+          go-version: "1.20"
 
       - uses: actions/checkout@v4
         with:
-          ref: 'v0.34.x'
+          ref: "v0.34.x"
 
       - name: Capture git repo info
         id: git-info
